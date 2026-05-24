@@ -31,7 +31,7 @@ export type AdminEvent = {
   is_published: boolean;
   is_featured: boolean;
   sort_order: number;
-  gallery: { id?: number; image: string; sort_order: number }[];
+  gallery: { id?: number; image_url: string; sort_order: number }[];
   created_at: string;
   updated_at: string;
 };
@@ -86,20 +86,6 @@ function auth(token: string) {
   return { token };
 }
 
-function appendFormValue(fd: FormData, key: string, value: unknown) {
-  if (value === undefined || value === null) return;
-  if (typeof value === "boolean") {
-    fd.append(key, value ? "true" : "false");
-    return;
-  }
-  fd.append(key, String(value));
-}
-
-export type AdminEventFiles = {
-  image?: File | null;
-  gallery?: File[];
-};
-
 export async function login(username: string, password: string) {
   return apiRequest<{ access: string; refresh: string }>("/auth/token/", {
     method: "POST",
@@ -126,26 +112,11 @@ export async function fetchAdminEvent(token: string, slug: string) {
 export async function saveAdminEvent(
   token: string,
   payload: Partial<AdminEvent> & { slug?: string },
-  slug?: string,
-  files?: AdminEventFiles
+  slug?: string
 ) {
   const path = slug ? `/admin/events/${slug}/` : "/admin/events/";
   const method = slug ? "PATCH" : "POST";
-  const hasFiles = Boolean(files?.image) || Boolean(files?.gallery?.length);
-
-  if (!hasFiles) {
-    return apiRequest<AdminEvent>(path, { method, json: payload, ...auth(token) });
-  }
-
-  const fd = new FormData();
-  const { gallery: _gallery, ...rest } = payload;
-  for (const [key, value] of Object.entries(rest)) {
-    appendFormValue(fd, key, value);
-  }
-  if (files?.image) fd.append("image", files.image);
-  files?.gallery?.forEach((file) => fd.append("gallery", file));
-
-  return apiRequest<AdminEvent>(path, { method, formData: fd, ...auth(token) });
+  return apiRequest<AdminEvent>(path, { method, json: payload, ...auth(token) });
 }
 
 export async function deleteAdminEvent(token: string, slug: string) {
@@ -182,24 +153,11 @@ export async function fetchAdminGallery(token: string) {
 export async function saveGalleryImage(
   token: string,
   payload: Partial<AdminGalleryImage>,
-  id?: number,
-  file?: File | null
+  id?: number
 ) {
   const path = id ? `/admin/gallery/${id}/` : "/admin/gallery/";
-  const method = id ? "PATCH" : "POST";
-
-  if (file) {
-    const fd = new FormData();
-    appendFormValue(fd, "alt", payload.alt);
-    appendFormValue(fd, "caption", payload.caption);
-    appendFormValue(fd, "sort_order", payload.sort_order);
-    appendFormValue(fd, "is_published", payload.is_published);
-    fd.append("src", file);
-    return apiRequest<AdminGalleryImage>(path, { method, formData: fd, ...auth(token) });
-  }
-
   return apiRequest<AdminGalleryImage>(path, {
-    method,
+    method: id ? "PATCH" : "POST",
     json: payload,
     ...auth(token),
   });

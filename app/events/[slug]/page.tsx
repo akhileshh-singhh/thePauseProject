@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { EventDetailView } from "@/components/events/EventDetailView";
 import { getAllSlugs, getEventBySlug, getSiteSettings } from "@/lib/content";
-import { mediaUrl } from "@/lib/media-url";
 
 export const revalidate = 60;
 
@@ -28,7 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: event.title,
       description: event.shortDescription,
-      images: [{ url: mediaUrl(event.image), width: 1200, height: 630, alt: event.title }],
+      images: [{ url: event.image, width: 1200, height: 630, alt: event.title }],
     },
   };
 }

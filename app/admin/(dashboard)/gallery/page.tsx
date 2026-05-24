@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import { getAccessToken } from "@/lib/admin-auth";
 import {
@@ -8,7 +9,6 @@ import {
   saveGalleryImage,
   type AdminGalleryImage,
 } from "@/lib/admin-api";
-import { ImageFileInput } from "@/components/admin/ImageFileInput";
 import {
   AdminAlert,
   AdminButton,
@@ -19,15 +19,12 @@ import {
   AdminSpinner,
   AdminTextarea,
 } from "@/components/admin/ui";
-import { CmsImage } from "@/components/ui/CmsImage";
 
 export default function AdminGalleryPage() {
   const [images, setImages] = useState<AdminGalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ alt: "", caption: "" });
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [fileInputKey, setFileInputKey] = useState(0);
+  const [form, setForm] = useState({ src: "", alt: "", caption: "" });
   const [saving, setSaving] = useState(false);
 
   async function load() {
@@ -50,27 +47,15 @@ export default function AdminGalleryPage() {
     e.preventDefault();
     const token = getAccessToken();
     if (!token) return;
-    if (!imageFile) {
-      setError("Please choose an image to upload.");
-      return;
-    }
     setSaving(true);
     try {
-      const created = await saveGalleryImage(
-        token,
-        {
-          ...form,
-          sort_order: images.length,
-          is_published: true,
-        },
-        undefined,
-        imageFile
-      );
+      const created = await saveGalleryImage(token, {
+        ...form,
+        sort_order: images.length,
+        is_published: true,
+      });
       setImages((prev) => [...prev, created]);
-      setForm({ alt: "", caption: "" });
-      setImageFile(null);
-      setFileInputKey((k) => k + 1);
-      setError(null);
+      setForm({ src: "", alt: "", caption: "" });
     } catch {
       setError("Could not add image.");
     } finally {
@@ -105,12 +90,12 @@ export default function AdminGalleryPage() {
           Add image
         </p>
         <form onSubmit={handleAdd} className="mt-5 grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <ImageFileInput
-              key={fileInputKey}
-              label="Image"
+          <div className="space-y-2 sm:col-span-2">
+            <AdminLabel>Image URL</AdminLabel>
+            <AdminInput
+              value={form.src}
+              onChange={(e) => setForm({ ...form, src: e.target.value })}
               required
-              onFileChange={setImageFile}
             />
           </div>
           <div className="space-y-2">
@@ -146,13 +131,7 @@ export default function AdminGalleryPage() {
             className="overflow-hidden rounded-3xl border border-tp-charcoal/8 bg-tp-warm-white/80"
           >
             <div className="relative aspect-[4/3]">
-              <CmsImage
-                src={img.src}
-                alt={img.alt}
-                fill
-                className="object-cover"
-                sizes="400px"
-              />
+              <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="400px" />
             </div>
             <div className="p-4">
               <p className="font-general text-sm text-tp-charcoal">{img.alt}</p>

@@ -1,9 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { WorkshopEvent } from "@/lib/types";
-import { CmsImage } from "@/components/ui/CmsImage";
 import { Button } from "@/components/ui/Button";
 import { softScale } from "@/animations/variants";
 
@@ -25,7 +25,7 @@ export function EventCard({ event, index }: EventCardProps) {
         className="block shrink-0 tp-focus-ring rounded-t-3xl"
       >
         <div className="relative aspect-[4/3] w-full overflow-hidden">
-          <CmsImage
+          <Image
             src={event.image}
             alt={`${event.title} — workshop visual`}
             fill

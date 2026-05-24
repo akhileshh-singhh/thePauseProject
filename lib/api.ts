@@ -2,7 +2,6 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://127.0.0.1:8000/api";
 
 export const API_REVALIDATE_SECONDS = 60;
-const API_TIMEOUT_MS = 10_000;
 
 export function isApiEnabled() {
   return Boolean(process.env.NEXT_PUBLIC_API_URL);
@@ -23,41 +22,29 @@ export class ApiError extends Error {
 type RequestOptions = RequestInit & {
   token?: string | null;
   json?: unknown;
-  formData?: FormData;
   revalidate?: number | false;
 };
 
 export async function apiRequest<T>(
   path: string,
-  { token, json, formData, headers, revalidate, ...init }: RequestOptions = {}
+  { token, json, headers, revalidate, ...init }: RequestOptions = {}
 ): Promise<T> {
   const url = path.startsWith("http")
     ? path
     : `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
-
   const res = await fetch(url, {
     ...init,
-    signal: controller.signal,
     headers: {
-      ...(json !== undefined && formData === undefined
-        ? { "Content-Type": "application/json" }
-        : {}),
+      ...(json !== undefined ? { "Content-Type": "application/json" } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
-    body:
-      formData !== undefined
-        ? formData
-        : json !== undefined
-          ? JSON.stringify(json)
-          : init.body,
+    body: json !== undefined ? JSON.stringify(json) : init.body,
     ...(revalidate !== undefined
       ? { next: { revalidate: revalidate === false ? 0 : revalidate } }
       : { cache: "no-store" }),
-  }).finally(() => clearTimeout(timeout));
+  });
 
   const text = await res.text();
   let data: unknown = null;

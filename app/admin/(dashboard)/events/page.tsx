@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getAccessToken } from "@/lib/admin-auth";
@@ -13,7 +14,6 @@ import {
   AdminPageHeader,
   AdminSpinner,
 } from "@/components/admin/ui";
-import { CmsImage } from "@/components/ui/CmsImage";
 
 export default function AdminEventsPage() {
   const [events, setEvents] = useState<AdminEvent[]>([]);
@@ -86,7 +86,7 @@ export default function AdminEventsPage() {
               className="group flex flex-col gap-4 rounded-3xl border border-tp-charcoal/8 bg-tp-warm-white/80 p-4 transition hover:border-tp-olive/25 sm:flex-row sm:items-center sm:p-5"
             >
               <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-2xl sm:h-20 sm:w-28">
-                <CmsImage
+                <Image
                   src={event.image}
                   alt=""
                   fill
