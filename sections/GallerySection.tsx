@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import type { GalleryImage } from "@/lib/types";
+import { CmsImage } from "@/components/ui/CmsImage";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { defaultSiteSettings } from "@/lib/site-defaults";
 import type { SiteSettingsData } from "@/lib/types";
@@ -49,7 +49,7 @@ export function GallerySection({ images, settings }: GallerySectionProps) {
               className="group flex h-full flex-col overflow-hidden rounded-2xl border border-tp-charcoal/10 bg-tp-warm-white shadow-[0_16px_50px_rgba(42,40,36,0.06)]"
             >
               <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden">
-                <Image
+                <CmsImage
                   src={img.src}
                   alt={img.alt}
                   fill

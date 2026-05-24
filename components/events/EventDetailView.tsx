@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { WorkshopEvent } from "@/lib/types";
+import { CmsImage } from "@/components/ui/CmsImage";
 import { Button } from "@/components/ui/Button";
 import { fadeUp, imageReveal, staggerContainer } from "@/animations/variants";
 
@@ -20,7 +20,7 @@ export function EventDetailView({ event }: EventDetailViewProps) {
         variants={imageReveal}
         className="relative aspect-[21/9] min-h-[220px] w-full overflow-hidden sm:min-h-[320px] lg:aspect-[24/9]"
       >
-        <Image
+        <CmsImage
           src={event.image}
           alt={`${event.title} at The Pause Project`}
           fill
@@ -98,7 +98,7 @@ export function EventDetailView({ event }: EventDetailViewProps) {
                     custom={i}
                     className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-tp-charcoal/10"
                   >
-                    <Image
+                    <CmsImage
                       src={src}
                       alt={`${event.title} gallery ${i + 1}`}
                       fill
@@ -123,7 +123,7 @@ export function EventDetailView({ event }: EventDetailViewProps) {
               </h2>
               <div className="mt-6 flex gap-4">
                 <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-tp-charcoal/10">
-                  <Image
+                  <CmsImage
                     src={event.host.image}
                     alt={`Portrait of ${event.host.name}`}
                     width={64}
