@@ -1,0 +1,122 @@
+[
+  {
+    "title": "Pottery & Pause",
+    "slug": "pottery-and-pause",
+    "date": "20 May 2026",
+    "time": "4:00 PM – 7:00 PM",
+    "venue": "Quiet Studio, Bandra West, Mumbai",
+    "price": "₹1,499",
+    "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&q=80",
+    "bookingLink": "https://district.in/",
+    "shortDescription": "Slow hand-building, soft light, and room to breathe between every coil.",
+    "description": "An unhurried evening of clay, touch, and quiet conversation. We begin with a grounding pause, move through guided hand-building, and end with tea as pieces rest for firing. No prior experience needed—only curiosity and the willingness to soften your pace.",
+    "gallery": [
+      "https://images.unsplash.com/photo-1493106641515-6b5631de79bb?w=900&q=80",
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=900&q=80",
+      "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=900&q=80"
+    ],
+    "host": {
+      "name": "Ira Menon",
+      "role": "Ceramic artist & facilitator",
+      "bio": "Ira’s practice sits between functional ware and contemplative making. She hosts sessions that privilege patience over perfection.",
+      "image": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80"
+    },
+    "category": "Pottery"
+  },
+  {
+    "title": "Golden Hour Painting Circle",
+    "slug": "golden-hour-painting",
+    "date": "24 May 2026",
+    "time": "5:30 PM – 8:00 PM",
+    "venue": "Rooftop Atelier, Khar, Mumbai",
+    "price": "₹1,899",
+    "image": "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1200&q=80",
+    "bookingLink": "https://in.bookmyshow.com/",
+    "shortDescription": "Acrylics, warm light, and a collective hush as Mumbai turns amber.",
+    "description": "Paint as the city exhales. We supply materials, gentle prompts, and a soundtrack of soft vinyl. The goal is not a finished masterpiece but a felt sense of color, distance, and presence. Suitable for beginners and returning creatives.",
+    "gallery": [
+      "https://images.unsplash.com/photo-1460661419201-fd443233b5b8?w=900&q=80",
+      "https://images.unsplash.com/photo-1513475382583-d06e58bcb0e0?w=900&q=80",
+      "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=900&q=80"
+    ],
+    "host": {
+      "name": "Devika Rao",
+      "role": "Painter & visual storyteller",
+      "bio": "Devika’s sessions blend observational exercises with intuitive mark-making—always with room for silence.",
+      "image": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80"
+    },
+    "category": "Painting"
+  },
+  {
+    "title": "Journal & Gentle Witness",
+    "slug": "journal-gentle-witness",
+    "date": "1 June 2026",
+    "time": "10:30 AM – 1:00 PM",
+    "venue": "The Reading Room, Fort, Mumbai",
+    "price": "₹999",
+    "image": "https://images.unsplash.com/photo-1517842645767-c967b5708b6a?w=1200&q=80",
+    "bookingLink": "https://district.in/",
+    "shortDescription": "Guided journaling, shared listening, and the quiet courage of being seen.",
+    "description": "A circle for words on paper and words in the room—lightly held. Prompts invite memory, gratitude, and gentle edges. We close with an optional share; silence is always welcome. Bring your own notebook or use ours.",
+    "gallery": [
+      "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=900&q=80",
+      "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=900&q=80",
+      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=900&q=80"
+    ],
+    "host": {
+      "name": "Noor Sheikh",
+      "role": "Writer & group facilitator",
+      "bio": "Noor designs containers for honest feeling without forcing disclosure—structure with softness.",
+      "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80"
+    },
+    "category": "Journaling"
+  },
+  {
+    "title": "Community Table: Creative Meetup",
+    "slug": "community-table-meetup",
+    "date": "7 June 2026",
+    "time": "6:00 PM – 9:00 PM",
+    "venue": "Courtyard Co-lab, Versova, Mumbai",
+    "price": "₹749",
+    "image": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&q=80",
+    "bookingLink": "https://in.bookmyshow.com/",
+    "shortDescription": "Strangers become collaborators over chai, sketches, and slow introductions.",
+    "description": "An open table for illustrators, poets, designers, and the creatively curious. Short intros, a collaborative prompt, and plenty of unstructured time. We keep phones away for the first hour so gazes can actually meet.",
+    "gallery": [
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=900&q=80",
+      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&q=80",
+      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80"
+    ],
+    "host": {
+      "name": "The Pause Project hosts",
+      "role": "Community team",
+      "bio": "Our hosts rotate weekly—artists, therapists-in-training, and longtime members who know how to hold a room.",
+      "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&q=80"
+    },
+    "category": "Meetup"
+  },
+  {
+    "title": "Stillness & Mark-Making",
+    "slug": "stillness-mark-making",
+    "date": "14 June 2026",
+    "time": "9:00 AM – 11:30 AM",
+    "venue": "Garden Annex, Juhu, Mumbai",
+    "price": "₹1,299",
+    "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+    "bookingLink": "https://district.in/",
+    "shortDescription": "Breath, charcoal, and ink—art therapy–inspired, non-clinical, deeply human.",
+    "description": "Inspired by art therapy principles but not a substitute for clinical care. We pair short mindfulness with expressive drawing exercises. Emphasis on process, metaphor, and self-compassion. Facilitators are trained in holding emotional safety.",
+    "gallery": [
+      "https://images.unsplash.com/photo-1513475382583-d06e58bcb0e0?w=900&q=80",
+      "https://images.unsplash.com/photo-1549887534-1541e9326642?w=900&q=80",
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=80"
+    ],
+    "host": {
+      "name": "Dr. Meera Kulkarni",
+      "role": "Counseling psychologist & art practitioner",
+      "bio": "Meera integrates somatic pauses with visual expression for groups seeking gentle depth.",
+      "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80"
+    },
+    "category": "Mindfulness"
+  }
+]
