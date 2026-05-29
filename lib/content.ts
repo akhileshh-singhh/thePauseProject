@@ -1,10 +1,6 @@
-import eventsData from "@/data/events.json";
-import galleryData from "@/data/gallery.json";
-import testimonialsData from "@/data/testimonials.json";
 import {
   API_REVALIDATE_SECONDS,
   apiRequest,
-  isApiEnabled,
   unwrapResults,
 } from "@/lib/api";
 import { defaultSiteSettings } from "@/lib/site-defaults";
@@ -71,37 +67,15 @@ export async function getSocialLinksFromApi(): Promise<SocialLinkItem[]> {
 }
 
 export async function getEvents(): Promise<WorkshopEvent[]> {
-  if (isApiEnabled()) {
-    try {
-      return await getFeaturedEventsFromApi();
-    } catch {
-      /* fallback */
-    }
-  }
-  return eventsData as WorkshopEvent[];
+  return getFeaturedEventsFromApi();
 }
 
 export async function getAllEvents(): Promise<WorkshopEvent[]> {
-  if (isApiEnabled()) {
-    try {
-      return await getEventsFromApi();
-    } catch {
-      /* fallback */
-    }
-  }
-  return eventsData as WorkshopEvent[];
+  return getEventsFromApi();
 }
 
 export async function getEventBySlug(slug: string): Promise<WorkshopEvent | undefined> {
-  if (isApiEnabled()) {
-    try {
-      const event = await getEventBySlugFromApi(slug);
-      if (event) return event;
-    } catch {
-      /* fallback */
-    }
-  }
-  return (eventsData as WorkshopEvent[]).find((e) => e.slug === slug);
+  return (await getEventBySlugFromApi(slug)) ?? undefined;
 }
 
 export async function getAllSlugs(): Promise<string[]> {
@@ -110,69 +84,18 @@ export async function getAllSlugs(): Promise<string[]> {
 }
 
 export async function getGallery(): Promise<GalleryImage[]> {
-  if (isApiEnabled()) {
-    try {
-      return await getGalleryFromApi();
-    } catch {
-      /* fallback */
-    }
-  }
-  return galleryData as GalleryImage[];
+  return getGalleryFromApi();
 }
 
 export async function getTestimonials(): Promise<Testimonial[]> {
-  if (isApiEnabled()) {
-    try {
-      return await getTestimonialsFromApi();
-    } catch {
-      /* fallback */
-    }
-  }
-  return testimonialsData as Testimonial[];
+  return getTestimonialsFromApi();
 }
 
 export async function getSiteSettings(): Promise<SiteSettingsData> {
-  if (isApiEnabled()) {
-    try {
-      const remote = await getSiteSettingsFromApi();
-      return { ...defaultSiteSettings, ...remote };
-    } catch {
-      /* fallback */
-    }
-  }
-  return defaultSiteSettings;
+  const remote = await getSiteSettingsFromApi();
+  return { ...defaultSiteSettings, ...remote };
 }
 
 export async function getSocialLinks(): Promise<SocialLinkItem[]> {
-  if (isApiEnabled()) {
-    try {
-      const links = await getSocialLinksFromApi();
-      if (links.length) return links;
-    } catch {
-      /* fallback */
-    }
-  }
-  return [
-    {
-      platform: "instagram",
-      title: "Instagram",
-      description: "Film stills from workshops, studio corners, and city light.",
-      href: defaultSiteSettings.instagram_url ?? "https://instagram.com",
-      cta_label: "Follow along",
-    },
-    {
-      platform: "linktree",
-      title: "Linktree",
-      description: "All links in one calm place—waitlists, playlists, reads.",
-      href: "https://linktr.ee",
-      cta_label: "Open tree",
-    },
-    {
-      platform: "whatsapp",
-      title: "WhatsApp",
-      description: "Say hello for private circles, collaborations, or gentle questions.",
-      href: defaultSiteSettings.contact_whatsapp_url ?? "https://wa.me/919876543210",
-      cta_label: "Message us",
-    },
-  ];
+  return getSocialLinksFromApi();
 }

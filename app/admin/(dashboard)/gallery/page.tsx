@@ -22,40 +22,51 @@ import {
 
 export default function AdminGalleryPage() {
   const [images, setImages] = useState<AdminGalleryImage[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => Boolean(getAccessToken()));
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ src: "", alt: "", caption: "" });
+  const [form, setForm] = useState({ alt: "", caption: "", src_file: null as File | null });
   const [saving, setSaving] = useState(false);
 
-  async function load() {
+  useEffect(() => {
+    let active = true;
     const token = getAccessToken();
     if (!token) return;
-    try {
-      setImages(await fetchAdminGallery(token));
-    } catch {
-      setError("Failed to load gallery.");
-    } finally {
-      setLoading(false);
-    }
-  }
 
-  useEffect(() => {
-    load();
+    void (async () => {
+      try {
+        const data = await fetchAdminGallery(token);
+        if (active) setImages(data);
+      } catch {
+        if (active) setError("Failed to load gallery.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   async function handleAdd(e: FormEvent) {
     e.preventDefault();
     const token = getAccessToken();
     if (!token) return;
+    if (!form.src_file) {
+      setError("Please select an image file.");
+      return;
+    }
     setSaving(true);
     try {
       const created = await saveGalleryImage(token, {
-        ...form,
+        alt: form.alt,
+        caption: form.caption,
         sort_order: images.length,
         is_published: true,
+        src_file: form.src_file,
       });
       setImages((prev) => [...prev, created]);
-      setForm({ src: "", alt: "", caption: "" });
+      setForm({ alt: "", caption: "", src_file: null });
     } catch {
       setError("Could not add image.");
     } finally {
@@ -91,12 +102,17 @@ export default function AdminGalleryPage() {
         </p>
         <form onSubmit={handleAdd} className="mt-5 grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
-            <AdminLabel>Image URL</AdminLabel>
+            <AdminLabel htmlFor="gallery_file">Image upload</AdminLabel>
             <AdminInput
-              value={form.src}
-              onChange={(e) => setForm({ ...form, src: e.target.value })}
+              id="gallery_file"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setForm({ ...form, src_file: e.target.files?.[0] ?? null })}
               required
             />
+            {form.src_file ? (
+              <p className="font-general text-xs text-tp-stone">Selected: {form.src_file.name}</p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <AdminLabel>Alt text</AdminLabel>
@@ -115,7 +131,7 @@ export default function AdminGalleryPage() {
             />
           </div>
           <div className="sm:col-span-2">
-            <AdminButton type="submit" disabled={saving}>
+            <AdminButton type="submit" disabled={saving || !form.src_file}>
               {saving ? "Adding…" : "Add to gallery"}
             </AdminButton>
           </div>

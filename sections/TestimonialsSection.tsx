@@ -31,7 +31,7 @@ export function TestimonialsSection({ testimonials, settings }: TestimonialsSect
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {testimonials.map((t, i) => (
             <motion.blockquote
-              key={t.name}
+              key={`${t.name || "testimonial"}-${i}`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10% 0px" }}

@@ -11,6 +11,7 @@ import {
   type AdminCategory,
   type AdminEvent,
   type AdminHost,
+  type SaveAdminEventPayload,
 } from "@/lib/admin-api";
 import {
   AdminAlert,
@@ -88,8 +89,8 @@ export function EventForm({ slug }: { slug?: string }) {
     is_published: true,
     is_featured: true,
     sort_order: 0,
-    gallery_urls: "",
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     const token = getAccessToken();
@@ -126,7 +127,6 @@ export function EventForm({ slug }: { slug?: string }) {
           is_published: event.is_published,
           is_featured: event.is_featured,
           sort_order: event.sort_order,
-          gallery_urls: event.gallery.map((g) => g.image_url).join("\n"),
         });
       })
       .catch(() => setError("Event not found."))
@@ -150,13 +150,7 @@ export function EventForm({ slug }: { slug?: string }) {
     setError(null);
     setSaved(false);
 
-    const gallery = form.gallery_urls
-      .split("\n")
-      .map((u) => u.trim())
-      .filter(Boolean)
-      .map((image_url, sort_order) => ({ image_url, sort_order }));
-
-    const payload = {
+    const payload: SaveAdminEventPayload = {
       title: form.title,
       slug: form.slug,
       event_date: form.event_date,
@@ -164,7 +158,6 @@ export function EventForm({ slug }: { slug?: string }) {
       end_time: form.end_time || null,
       venue: form.venue,
       price_display: form.price_display,
-      image: form.image,
       booking_link: form.booking_link,
       short_description: form.short_description,
       description: form.description,
@@ -173,8 +166,8 @@ export function EventForm({ slug }: { slug?: string }) {
       is_published: form.is_published,
       is_featured: form.is_featured,
       sort_order: form.sort_order,
-      gallery,
     };
+    if (imageFile) payload.image_file = imageFile;
 
     try {
       const result = await saveAdminEvent(token, payload, isNew ? undefined : slug);
@@ -304,8 +297,29 @@ export function EventForm({ slug }: { slug?: string }) {
         </p>
         <div className="mt-6 space-y-5">
           <div className="space-y-2">
-            <AdminLabel>Hero image URL</AdminLabel>
-            <AdminInput value={form.image} onChange={(e) => update("image", e.target.value)} />
+            <AdminLabel htmlFor="image_file">Hero image upload</AdminLabel>
+            <AdminInput
+              id="image_file"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+            />
+            {form.image ? (
+              <p className="font-general text-xs text-tp-stone">
+                Current image:{" "}
+                <a
+                  href={form.image}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2"
+                >
+                  open
+                </a>
+              </p>
+            ) : null}
+            {imageFile ? (
+              <p className="font-general text-xs text-tp-stone">Selected: {imageFile.name}</p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <AdminLabel>Short description</AdminLabel>
@@ -321,14 +335,6 @@ export function EventForm({ slug }: { slug?: string }) {
               rows={6}
               value={form.description}
               onChange={(e) => update("description", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <AdminLabel>Gallery URLs (one per line)</AdminLabel>
-            <AdminTextarea
-              rows={4}
-              value={form.gallery_urls}
-              onChange={(e) => update("gallery_urls", e.target.value)}
             />
           </div>
         </div>

@@ -13,7 +13,6 @@ export function ContactSection({ settings }: { settings?: SiteSettingsData }) {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const apiEnabled = Boolean(process.env.NEXT_PUBLIC_API_URL);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -25,11 +24,6 @@ export function ContactSection({ settings }: { settings?: SiteSettingsData }) {
       email: String(data.get("email") ?? ""),
       message: String(data.get("message") ?? ""),
     };
-
-    if (!apiEnabled) {
-      setSent(true);
-      return;
-    }
 
     setLoading(true);
     try {
@@ -90,9 +84,7 @@ export function ContactSection({ settings }: { settings?: SiteSettingsData }) {
           >
             <p className="font-display text-2xl text-tp-charcoal">Send a note</p>
             <p className="mt-2 font-general text-sm text-tp-stone">
-              {apiEnabled
-                ? "We read every note—usually within a day or two."
-                : "Connect NEXT_PUBLIC_API_URL to send messages to your admin inbox."}
+              We read every note—usually within a day or two.
             </p>
             <div className="mt-8 space-y-5">
               <label className="block">

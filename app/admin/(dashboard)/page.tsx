@@ -66,6 +66,7 @@ export default function AdminDashboardPage() {
               <ul className="mt-5 space-y-3 font-general text-sm">
                 {[
                   ["/admin/events", "Manage workshops"],
+                  ["/admin/categories", "Add event categories"],
                   ["/admin/gallery", "Edit gallery grid"],
                   ["/admin/testimonials", "Update voices"],
                   ["/admin/settings", "Hero & contact copy"],

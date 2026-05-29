@@ -51,8 +51,8 @@ export function Footer({ settings }: { settings?: SiteSettingsData }) {
               Social
             </p>
             <ul className="mt-4 space-y-2 font-accent text-sm text-tp-charcoal/90">
-              {socials.map((item) => (
-                <li key={item.href}>
+              {socials.map((item, i) => (
+                <li key={`${item.label}-${item.href || "empty"}-${i}`}>
                   <a
                     href={item.href}
                     target="_blank"

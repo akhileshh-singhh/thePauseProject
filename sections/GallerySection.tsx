@@ -37,7 +37,7 @@ export function GallerySection({ images, settings }: GallerySectionProps) {
         <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
           {images.map((img, i) => (
             <motion.figure
-              key={img.src}
+              key={`${img.src || "gallery-image"}-${i}`}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-5% 0px" }}
