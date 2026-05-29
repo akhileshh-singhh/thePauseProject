@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAccessToken } from "@/lib/admin-auth";
 import { fetchMessages, markMessageRead, type AdminMessage } from "@/lib/admin-api";
 import {
   AdminAlert,
@@ -25,19 +24,15 @@ export default function AdminMessagesPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token) return;
-    fetchMessages(token)
+    fetchMessages()
       .then(setMessages)
       .catch(() => setError("Failed to load messages."))
       .finally(() => setLoading(false));
   }, []);
 
   async function handleMarkRead(id: number) {
-    const token = getAccessToken();
-    if (!token) return;
     try {
-      const updated = await markMessageRead(token, id);
+      const updated = await markMessageRead(id);
       setMessages((prev) => prev.map((m) => (m.id === id ? updated : m)));
     } catch {
       setError("Could not update message.");

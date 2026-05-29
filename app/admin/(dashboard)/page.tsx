@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getAccessToken } from "@/lib/admin-auth";
 import { fetchStats, type AdminStats } from "@/lib/admin-api";
 import { StatCard } from "@/components/admin/StatCard";
 import {
@@ -18,9 +17,7 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token) return;
-    fetchStats(token)
+    fetchStats()
       .then(setStats)
       .catch(() => setError("Could not load dashboard stats."));
   }, []);

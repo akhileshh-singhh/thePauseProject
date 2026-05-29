@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
-import { getAccessToken } from "@/lib/admin-auth";
 import {
   deleteGalleryImage,
   fetchAdminGallery,
@@ -22,19 +21,17 @@ import {
 
 export default function AdminGalleryPage() {
   const [images, setImages] = useState<AdminGalleryImage[]>([]);
-  const [loading, setLoading] = useState(() => Boolean(getAccessToken()));
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ alt: "", caption: "", src_file: null as File | null });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let active = true;
-    const token = getAccessToken();
-    if (!token) return;
 
     void (async () => {
       try {
-        const data = await fetchAdminGallery(token);
+        const data = await fetchAdminGallery();
         if (active) setImages(data);
       } catch {
         if (active) setError("Failed to load gallery.");
@@ -50,15 +47,13 @@ export default function AdminGalleryPage() {
 
   async function handleAdd(e: FormEvent) {
     e.preventDefault();
-    const token = getAccessToken();
-    if (!token) return;
     if (!form.src_file) {
       setError("Please select an image file.");
       return;
     }
     setSaving(true);
     try {
-      const created = await saveGalleryImage(token, {
+      const created = await saveGalleryImage({
         alt: form.alt,
         caption: form.caption,
         sort_order: images.length,
@@ -76,10 +71,8 @@ export default function AdminGalleryPage() {
 
   async function handleDelete(id: number) {
     if (!confirm("Remove this image?")) return;
-    const token = getAccessToken();
-    if (!token) return;
     try {
-      await deleteGalleryImage(token, id);
+      await deleteGalleryImage(id);
       setImages((prev) => prev.filter((i) => i.id !== id));
     } catch {
       setError("Could not delete image.");

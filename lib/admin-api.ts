@@ -1,7 +1,75 @@
 "use client";
 
-import { apiRequest } from "@/lib/api";
+import { ApiError, apiRequest, type Paginated } from "@/lib/api";
+import {
+  clearTokens,
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+} from "@/lib/admin-auth";
 import type { WorkshopEvent } from "@/lib/types";
+
+export class AdminAuthError extends Error {
+  constructor(message = "Session expired. Please sign in again.") {
+    super(message);
+    this.name = "AdminAuthError";
+  }
+}
+
+type AdminRequestOptions = Omit<Parameters<typeof apiRequest>[1], "token">;
+
+async function refreshAccessToken(): Promise<string> {
+  const refresh = getRefreshToken();
+  if (!refresh) throw new AdminAuthError();
+
+  const data = await apiRequest<{ access: string }>("/auth/token/refresh/", {
+    method: "POST",
+    json: { refresh },
+  });
+
+  setTokens({ access: data.access, refresh });
+  return data.access;
+}
+
+function redirectToLogin() {
+  if (typeof window === "undefined") return;
+  clearTokens();
+  const next = `${window.location.pathname}${window.location.search}`;
+  window.location.href = `/admin/login?next=${encodeURIComponent(next)}`;
+}
+
+async function adminApiRequest<T>(
+  path: string,
+  options: AdminRequestOptions = {}
+): Promise<T> {
+  let token = getAccessToken();
+  if (!token) {
+    redirectToLogin();
+    throw new AdminAuthError();
+  }
+
+  try {
+    return await apiRequest<T>(path, { ...options, token });
+  } catch (err) {
+    const isExpired =
+      err instanceof ApiError &&
+      err.status === 401 &&
+      typeof err.data === "object" &&
+      err.data !== null &&
+      "code" in err.data &&
+      (err.data as { code: string }).code === "token_not_valid";
+
+    if (!isExpired) throw err;
+
+    try {
+      token = await refreshAccessToken();
+      return await apiRequest<T>(path, { ...options, token });
+    } catch {
+      redirectToLogin();
+      throw new AdminAuthError();
+    }
+  }
+}
 
 export type AdminStats = {
   events: number;
@@ -99,12 +167,6 @@ export type AdminCategory = {
 
 export type SiteSettingsData = Record<string, string>;
 
-export type Paginated<T> = { count: number; next: string | null; previous: string | null; results: T[] };
-
-function auth(token: string) {
-  return { token };
-}
-
 export async function login(username: string, password: string) {
   return apiRequest<{ access: string; refresh: string }>("/auth/token/", {
     method: "POST",
@@ -112,27 +174,22 @@ export async function login(username: string, password: string) {
   });
 }
 
-export async function fetchStats(token: string) {
-  return apiRequest<AdminStats>("/admin/stats/", auth(token));
+export async function fetchStats() {
+  return adminApiRequest<AdminStats>("/admin/stats/");
 }
 
-export async function fetchAdminEvents(token: string) {
-  const data = await apiRequest<Paginated<AdminEvent> | AdminEvent[]>(
-    "/admin/events/",
-    auth(token)
+export async function fetchAdminEvents() {
+  const data = await adminApiRequest<Paginated<AdminEvent> | AdminEvent[]>(
+    "/admin/events/"
   );
   return Array.isArray(data) ? data : data.results;
 }
 
-export async function fetchAdminEvent(token: string, slug: string) {
-  return apiRequest<AdminEvent>(`/admin/events/${slug}/`, auth(token));
+export async function fetchAdminEvent(slug: string) {
+  return adminApiRequest<AdminEvent>(`/admin/events/${slug}/`);
 }
 
-export async function saveAdminEvent(
-  token: string,
-  payload: SaveAdminEventPayload,
-  slug?: string
-) {
+export async function saveAdminEvent(payload: SaveAdminEventPayload, slug?: string) {
   const path = slug ? `/admin/events/${slug}/` : "/admin/events/";
   const method = slug ? "PATCH" : "POST";
   const body = new FormData();
@@ -153,62 +210,51 @@ export async function saveAdminEvent(
   body.append("sort_order", String(payload.sort_order));
   if (payload.image_file) body.append("image_file", payload.image_file);
 
-  return apiRequest<AdminEvent>(path, { method, body, ...auth(token) });
+  return adminApiRequest<AdminEvent>(path, { method, body });
 }
 
-export async function deleteAdminEvent(token: string, slug: string) {
-  return apiRequest<void>(`/admin/events/${slug}/`, {
+export async function deleteAdminEvent(slug: string) {
+  return adminApiRequest<void>(`/admin/events/${slug}/`, {
     method: "DELETE",
-    ...auth(token),
   });
 }
 
-export async function fetchHosts(token: string) {
-  const data = await apiRequest<Paginated<AdminHost> | AdminHost[]>(
-    "/admin/hosts/",
-    auth(token)
+export async function fetchHosts() {
+  const data = await adminApiRequest<Paginated<AdminHost> | AdminHost[]>(
+    "/admin/hosts/"
   );
   return Array.isArray(data) ? data : data.results;
 }
 
-export async function fetchCategories(token: string) {
-  const data = await apiRequest<Paginated<AdminCategory> | AdminCategory[]>(
-    "/admin/categories/",
-    auth(token)
+export async function fetchCategories() {
+  const data = await adminApiRequest<Paginated<AdminCategory> | AdminCategory[]>(
+    "/admin/categories/"
   );
   return Array.isArray(data) ? data : data.results;
 }
 
-export async function saveCategory(
-  token: string,
-  payload: Partial<AdminCategory>,
-  id?: number
-) {
+export async function saveCategory(payload: Partial<AdminCategory>, id?: number) {
   const path = id ? `/admin/categories/${id}/` : "/admin/categories/";
-  return apiRequest<AdminCategory>(path, {
+  return adminApiRequest<AdminCategory>(path, {
     method: id ? "PATCH" : "POST",
     json: payload,
-    ...auth(token),
   });
 }
 
-export async function deleteCategory(token: string, id: number) {
-  return apiRequest<void>(`/admin/categories/${id}/`, {
+export async function deleteCategory(id: number) {
+  return adminApiRequest<void>(`/admin/categories/${id}/`, {
     method: "DELETE",
-    ...auth(token),
   });
 }
 
-export async function fetchAdminGallery(token: string) {
-  const data = await apiRequest<Paginated<AdminGalleryImage> | AdminGalleryImage[]>(
-    "/admin/gallery/",
-    auth(token)
+export async function fetchAdminGallery() {
+  const data = await adminApiRequest<Paginated<AdminGalleryImage> | AdminGalleryImage[]>(
+    "/admin/gallery/"
   );
   return Array.isArray(data) ? data : data.results;
 }
 
 export async function saveGalleryImage(
-  token: string,
   payload: { alt: string; caption: string; sort_order: number; is_published: boolean; src_file: File },
   id?: number
 ) {
@@ -220,72 +266,60 @@ export async function saveGalleryImage(
   body.append("is_published", String(payload.is_published));
   body.append("src_file", payload.src_file);
 
-  return apiRequest<AdminGalleryImage>(path, {
+  return adminApiRequest<AdminGalleryImage>(path, {
     method: id ? "PATCH" : "POST",
     body,
-    ...auth(token),
   });
 }
 
-export async function deleteGalleryImage(token: string, id: number) {
-  return apiRequest<void>(`/admin/gallery/${id}/`, {
+export async function deleteGalleryImage(id: number) {
+  return adminApiRequest<void>(`/admin/gallery/${id}/`, {
     method: "DELETE",
-    ...auth(token),
   });
 }
 
-export async function fetchAdminTestimonials(token: string) {
-  const data = await apiRequest<Paginated<AdminTestimonial> | AdminTestimonial[]>(
-    "/admin/testimonials/",
-    auth(token)
+export async function fetchAdminTestimonials() {
+  const data = await adminApiRequest<Paginated<AdminTestimonial> | AdminTestimonial[]>(
+    "/admin/testimonials/"
   );
   return Array.isArray(data) ? data : data.results;
 }
 
-export async function saveTestimonial(
-  token: string,
-  payload: Partial<AdminTestimonial>,
-  id?: number
-) {
+export async function saveTestimonial(payload: Partial<AdminTestimonial>, id?: number) {
   const path = id ? `/admin/testimonials/${id}/` : "/admin/testimonials/";
-  return apiRequest<AdminTestimonial>(path, {
+  return adminApiRequest<AdminTestimonial>(path, {
     method: id ? "PATCH" : "POST",
     json: payload,
-    ...auth(token),
   });
 }
 
-export async function deleteTestimonial(token: string, id: number) {
-  return apiRequest<void>(`/admin/testimonials/${id}/`, {
+export async function deleteTestimonial(id: number) {
+  return adminApiRequest<void>(`/admin/testimonials/${id}/`, {
     method: "DELETE",
-    ...auth(token),
   });
 }
 
-export async function fetchMessages(token: string) {
-  const data = await apiRequest<Paginated<AdminMessage> | AdminMessage[]>(
-    "/admin/messages/",
-    auth(token)
+export async function fetchMessages() {
+  const data = await adminApiRequest<Paginated<AdminMessage> | AdminMessage[]>(
+    "/admin/messages/"
   );
   return Array.isArray(data) ? data : data.results;
 }
 
-export async function markMessageRead(token: string, id: number) {
-  return apiRequest<AdminMessage>(`/admin/messages/${id}/mark_read/`, {
+export async function markMessageRead(id: number) {
+  return adminApiRequest<AdminMessage>(`/admin/messages/${id}/mark_read/`, {
     method: "POST",
-    ...auth(token),
   });
 }
 
-export async function fetchSiteSettings(token: string) {
-  return apiRequest<SiteSettingsData>("/admin/site/", auth(token));
+export async function fetchSiteSettings() {
+  return adminApiRequest<SiteSettingsData>("/admin/site/");
 }
 
-export async function saveSiteSettings(token: string, payload: SiteSettingsData) {
-  return apiRequest<SiteSettingsData>("/admin/site/", {
+export async function saveSiteSettings(payload: SiteSettingsData) {
+  return adminApiRequest<SiteSettingsData>("/admin/site/", {
     method: "PATCH",
     json: payload,
-    ...auth(token),
   });
 }
 

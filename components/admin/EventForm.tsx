@@ -2,7 +2,6 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAccessToken } from "@/lib/admin-auth";
 import {
   fetchAdminEvent,
   fetchCategories,
@@ -93,10 +92,7 @@ export function EventForm({ slug }: { slug?: string }) {
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token) return;
-
-    Promise.all([fetchHosts(token), fetchCategories(token)])
+    Promise.all([fetchHosts(), fetchCategories()])
       .then(([h, c]) => {
         setHosts(h);
         setCategories(c);
@@ -108,7 +104,7 @@ export function EventForm({ slug }: { slug?: string }) {
 
     if (!slug) return;
 
-    fetchAdminEvent(token, slug)
+    fetchAdminEvent(slug)
       .then((event: AdminEvent) => {
         setForm({
           title: event.title,
@@ -143,9 +139,6 @@ export function EventForm({ slug }: { slug?: string }) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const token = getAccessToken();
-    if (!token) return;
-
     setSaving(true);
     setError(null);
     setSaved(false);
@@ -170,7 +163,7 @@ export function EventForm({ slug }: { slug?: string }) {
     if (imageFile) payload.image_file = imageFile;
 
     try {
-      const result = await saveAdminEvent(token, payload, isNew ? undefined : slug);
+      const result = await saveAdminEvent(payload, isNew ? undefined : slug);
       setSaved(true);
       if (isNew) router.replace(`/admin/events/${result.slug}`);
     } catch {

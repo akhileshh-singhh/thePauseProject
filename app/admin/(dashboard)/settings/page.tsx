@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { getAccessToken } from "@/lib/admin-auth";
 import { fetchSiteSettings, saveSiteSettings } from "@/lib/admin-api";
 import {
   AdminAlert,
@@ -71,9 +70,7 @@ export default function AdminSettingsPage() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token) return;
-    fetchSiteSettings(token)
+    fetchSiteSettings()
       .then((data) => setSettings(data as Record<string, string>))
       .catch(() => setError("Failed to load settings."))
       .finally(() => setLoading(false));
@@ -85,13 +82,11 @@ export default function AdminSettingsPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const token = getAccessToken();
-    if (!token) return;
     setSaving(true);
     setError(null);
     setSaved(false);
     try {
-      const data = await saveSiteSettings(token, settings);
+      const data = await saveSiteSettings(settings);
       setSettings(data as Record<string, string>);
       setSaved(true);
     } catch {

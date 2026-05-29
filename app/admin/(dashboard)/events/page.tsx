@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getAccessToken } from "@/lib/admin-auth";
 import { deleteAdminEvent, fetchAdminEvents, type AdminEvent } from "@/lib/admin-api";
 import {
   AdminAlert,
@@ -21,11 +20,9 @@ export default function AdminEventsPage() {
   const [error, setError] = useState<string | null>(null);
 
   async function load() {
-    const token = getAccessToken();
-    if (!token) return;
     setLoading(true);
     try {
-      setEvents(await fetchAdminEvents(token));
+      setEvents(await fetchAdminEvents());
       setError(null);
     } catch {
       setError("Failed to load events.");
@@ -40,10 +37,8 @@ export default function AdminEventsPage() {
 
   async function handleDelete(slug: string) {
     if (!confirm("Delete this event permanently?")) return;
-    const token = getAccessToken();
-    if (!token) return;
     try {
-      await deleteAdminEvent(token, slug);
+      await deleteAdminEvent(slug);
       setEvents((prev) => prev.filter((e) => e.slug !== slug));
     } catch {
       setError("Could not delete event.");

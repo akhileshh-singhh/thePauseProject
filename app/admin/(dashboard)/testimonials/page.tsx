@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { getAccessToken } from "@/lib/admin-auth";
 import {
   deleteTestimonial,
   fetchAdminTestimonials,
@@ -27,10 +26,8 @@ export default function AdminTestimonialsPage() {
   const [saving, setSaving] = useState(false);
 
   async function load() {
-    const token = getAccessToken();
-    if (!token) return;
     try {
-      setItems(await fetchAdminTestimonials(token));
+      setItems(await fetchAdminTestimonials());
     } catch {
       setError("Failed to load testimonials.");
     } finally {
@@ -44,11 +41,9 @@ export default function AdminTestimonialsPage() {
 
   async function handleAdd(e: FormEvent) {
     e.preventDefault();
-    const token = getAccessToken();
-    if (!token) return;
     setSaving(true);
     try {
-      const created = await saveTestimonial(token, {
+      const created = await saveTestimonial({
         ...form,
         sort_order: items.length,
         is_published: true,
@@ -65,10 +60,8 @@ export default function AdminTestimonialsPage() {
 
   async function handleDelete(id: number) {
     if (!confirm("Delete this testimonial?")) return;
-    const token = getAccessToken();
-    if (!token) return;
     try {
-      await deleteTestimonial(token, id);
+      await deleteTestimonial(id);
       setItems((prev) => prev.filter((t) => t.id !== id));
     } catch {
       setError("Could not delete.");

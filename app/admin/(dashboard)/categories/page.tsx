@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { getAccessToken } from "@/lib/admin-auth";
 import {
   deleteCategory,
   fetchCategories,
@@ -20,19 +19,17 @@ import {
 
 export default function AdminCategoriesPage() {
   const [items, setItems] = useState<AdminCategory[]>([]);
-  const [loading, setLoading] = useState(() => Boolean(getAccessToken()));
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ name: "", sort_order: 0 });
 
   useEffect(() => {
     let active = true;
-    const token = getAccessToken();
-    if (!token) return;
 
     void (async () => {
       try {
-        const categories = await fetchCategories(token);
+        const categories = await fetchCategories();
         if (active) {
           setItems(categories);
           setError(null);
@@ -51,12 +48,10 @@ export default function AdminCategoriesPage() {
 
   async function handleAdd(e: FormEvent) {
     e.preventDefault();
-    const token = getAccessToken();
-    if (!token) return;
     setSaving(true);
     setError(null);
     try {
-      const created = await saveCategory(token, {
+      const created = await saveCategory({
         name: form.name.trim(),
         sort_order: form.sort_order,
       });
@@ -75,11 +70,9 @@ export default function AdminCategoriesPage() {
 
   async function handleDelete(id: number) {
     if (!confirm("Delete this category? You cannot remove categories used by events.")) return;
-    const token = getAccessToken();
-    if (!token) return;
     setError(null);
     try {
-      await deleteCategory(token, id);
+      await deleteCategory(id);
       setItems((prev) => prev.filter((item) => item.id !== id));
     } catch {
       setError("Could not delete category. Remove it from linked events first.");
